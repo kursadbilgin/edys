@@ -1,0 +1,33 @@
+from .base import *
+
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
+
+ALLOWED_HOSTS = ['*']
+
+
+ADMINS = (
+    # ("Your Name", "your_email@example.com"),
+)
+
+
+# App used only at development
+INSTALLED_APPS += (
+
+)
+
+
+# Database
+# https://docs.djangoproject.com/en/1.9/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
+    }
+}
