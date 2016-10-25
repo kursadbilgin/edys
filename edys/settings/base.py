@@ -40,10 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
     'edys',
 
     # External Applications
+    'rest_framework',
 
     # Internal Applications
     'core',
@@ -107,6 +107,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 
 LANGUAGE_CODE = 'tr-TR'
+
+LANGUAGES = [
+    ('tr', 'Türkçe'),
+    ('en', 'English'),
+]
+
+LOCALE_PATHS = [
+    os.path.join(PACKAGE_ROOT, 'locale')
+]
 
 TIME_ZONE = 'Europe/Istanbul'
 
