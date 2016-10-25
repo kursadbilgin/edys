@@ -80,7 +80,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'edys.wsgi.application'
 
-# AUTH_USER_MODEL = 'user.User'
+AUTH_USER_MODEL = 'user.User'
 
 
 # Password validation
