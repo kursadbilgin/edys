@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-26 00:17+0300\n"
+"POT-Creation-Date: 2016-11-22 11:47+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,6 +41,10 @@ msgstr "İlgi"
 #: edys/apps/core/models.py:18
 msgid "Interests"
 msgstr "İlgiler"
+
+#: edys/apps/journal/apps.py:7
+msgid "Journal"
+msgstr "Dergi"
 
 #: edys/apps/user/admin.py:12
 msgid "Base Informations"

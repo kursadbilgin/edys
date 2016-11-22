@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     # Internal Applications
     'core',
     'user',
+    'journal',
 ]
 
 MIDDLEWARE_CLASSES = [
