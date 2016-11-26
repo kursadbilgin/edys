@@ -4,7 +4,6 @@ from rest_framework import serializers
 # Local Django
 from user.models import User
 
-
 ###     User     ###
 
 class UserSerializer(serializers.ModelSerializer):

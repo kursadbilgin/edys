@@ -4,9 +4,8 @@ from django.conf import settings
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.utils.translation import ugettext_lazy as _
 
-# Local Django
-from core.models import DateModel
 
+###     User     ###
 
 class UserManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, password=None):
@@ -14,9 +13,10 @@ class UserManager(BaseUserManager):
             raise ValueError(_('Users must have email address.'))
 
         user = self.model(
-            email=self.normalize_email(email),
-            first_name=first_name,
-            last_name=last_name)
+            email = self.normalize_email(email),
+            first_name = first_name,
+            last_name = last_name
+        )
 
         user.set_password(password)
         user.save(using=self._db)

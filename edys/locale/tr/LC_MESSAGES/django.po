@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-22 11:47+0300\n"
+"POT-Creation-Date: 2016-11-25 13:04+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,7 +30,8 @@ msgstr "Oluşturulma Tarihi"
 msgid "Update Date"
 msgstr "Güncelleme Tarihi"
 
-#: edys/apps/core/models.py:14
+#: edys/apps/core/models.py:14 edys/apps/journal/models.py:14
+#: edys/apps/journal/models.py:29 edys/apps/journal/models.py:49
 msgid "Name"
 msgstr "İsim"
 
@@ -42,9 +43,55 @@ msgstr "İlgi"
 msgid "Interests"
 msgstr "İlgiler"
 
-#: edys/apps/journal/apps.py:7
+#: edys/apps/journal/apps.py:7 edys/apps/journal/models.py:35
 msgid "Journal"
 msgstr "Dergi"
+
+#: edys/apps/journal/models.py:15 edys/apps/journal/models.py:51
+msgid "Abstract"
+msgstr "Özet"
+
+#: edys/apps/journal/models.py:18
+msgid "Title"
+msgstr "Başlık"
+
+#: edys/apps/journal/models.py:19 edys/apps/journal/models.py:32
+#: edys/apps/journal/models.py:50
+msgid "Titles"
+msgstr "Başlıklar"
+
+#: edys/apps/journal/models.py:30
+msgid "Period"
+msgstr "Periyot"
+
+#: edys/apps/journal/models.py:31
+msgid "Content"
+msgstr "İçerik"
+
+#: edys/apps/journal/models.py:36
+msgid "Journals"
+msgstr "Dergiler"
+
+#: edys/apps/journal/models.py:54 edys/apps/journal/models.py:55
+#: edys/apps/journal/models.py:76
+msgid "Article"
+msgstr "Makale"
+
+#: edys/apps/journal/models.py:74
+msgid "Description"
+msgstr "Açıklama"
+
+#: edys/apps/journal/models.py:75
+msgid "Document"
+msgstr "Döküman"
+
+#: edys/apps/journal/models.py:79
+msgid "Article Document"
+msgstr "Makale Dökümanı"
+
+#: edys/apps/journal/models.py:80
+msgid "Article Documents"
+msgstr "Makale Dökümanları"
 
 #: edys/apps/user/admin.py:12
 msgid "Base Informations"
