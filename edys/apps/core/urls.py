@@ -33,6 +33,7 @@ for api in LIST:
     router.register(api[0], api[1])
 
 urlpatterns = [
+
     # Default
     url(r'^admin/', admin.site.urls),
 
