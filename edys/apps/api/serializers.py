@@ -4,7 +4,7 @@ from rest_framework import serializers
 # Local Django
 from user.models import User
 from core.models import Interest
-from journal.models import Journal, Title, Article, ArticleDocument
+from journal.models import Journal, Article, ArticleDocument
 
 ###     User     ###
 
@@ -16,6 +16,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 ####################
 
+
 ###     Interest     ###
 
 class InterestSerializer(serializers.ModelSerializer):
@@ -25,6 +26,7 @@ class InterestSerializer(serializers.ModelSerializer):
         fields = ('name',)
 
 ####################
+
 
 ###     Article Document     ###
 
@@ -36,11 +38,11 @@ class ArticleDocumentSerializer(serializers.ModelSerializer):
 
 ####################
 
+
 ###     Article     ###
 
 class ArticleSerializer(serializers.ModelSerializer):
     article_documents = ArticleDocumentSerializer(read_only=True, many=True)
-
 
     class Meta:
         model = Article
@@ -48,24 +50,14 @@ class ArticleSerializer(serializers.ModelSerializer):
 
 ####################
 
-###     Title     ###
-
-class TitleSerializer(serializers.ModelSerializer):
-    article_set = ArticleSerializer(read_only=True, many=True)
-
-    class Meta:
-        model = Title
-        fields = ('name', 'article_set')
-
-####################
 
 ###     Journal     ###
 
 class JournalSerializer(serializers.ModelSerializer):
-    titles = TitleSerializer(read_only=True, many=True)
+    article = ArticleSerializer(read_only=True, many=True)
 
     class Meta:
         model = Journal
-        fields = ('name', 'titles')
+        fields = ('name', 'article')
 
 ####################

@@ -4,7 +4,7 @@ from rest_framework import viewsets
 # Local Django
 from user.models import User
 from core.models import Interest
-from journal.models import Journal, Title, Article, ArticleDocument
+from journal.models import Journal, Article, ArticleDocument
 
 # Api
 from api.serializers import UserSerializer, JournalSerializer
