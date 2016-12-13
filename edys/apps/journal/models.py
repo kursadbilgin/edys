@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 # Local Django
+from user.models import User
 from core.models import DateModel
 
 ###     Journal     ###

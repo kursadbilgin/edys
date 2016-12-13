@@ -20,6 +20,7 @@ from rest_framework import routers
 # Django
 from django.conf import settings
 from django.contrib import admin
+from django.views.static import serve
 from django.conf.urls import url, include
 
 # Api
@@ -40,4 +41,5 @@ urlpatterns = [
     # Django Rest Framework
     url(r'^api/', include(router.urls, namespace='api')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
