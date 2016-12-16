@@ -26,7 +26,7 @@ def default():
 def editor():
     journal_permissions = [p for p in Permission.objects.filter(Q(content_type__app_label__in=['journal']))]
 
-    create_group(GROUP_EDITOR, (user_permissions + journal_permissions))
+    create_group(GROUP_EDITOR, journal_permissions)
 
 
 def assigned_editor():

@@ -43,8 +43,7 @@ class Article(DateModel):
 ####################
 
 def set_upload_document_path(instance, filename):
-    return os.path.join(
-      "article_%d" % instance.article.id, filename)
+    return os.path.join("article_%d" % instance.article.id, filename)
 
 ####################
 

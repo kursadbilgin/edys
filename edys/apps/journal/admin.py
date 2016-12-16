@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 
 # Local Django
 from journal.models import Journal, Article, ArticleDocument
+from core.variables import GROUP_EDITOR
 
 ###     Journal     ###
 
@@ -14,26 +15,31 @@ class JournalAdmin(admin.ModelAdmin):
     def get_actions(self, request):
         actions = super(JournalAdmin, self).get_actions(request)
 
-        if not request.user.is_superuser:
+        group_names = [group.name for group in request.user.groups.all()]
+        if not request.user.is_superuser or GROUP_EDITOR in group_names:
             del actions['delete_selected']
 
         return actions
 
     def has_add_permission(self, request):
-        if request.user.is_superuser:
+        group_names = [group.name for group in request.user.groups.all()]
+        if request.user.is_superuser or GROUP_EDITOR in group_names:
             return True
         else:
             return False
 
     def has_delete_permission(self, request, obj=None):
-        if request.user.is_superuser:
+        group_names = [group.name for group in request.user.groups.all()]
+        if request.user.is_superuser or GROUP_EDITOR in group_names:
             return True
         else:
             return False
 
     def get_readonly_fields(self, request, obj=None):
         actions = super(JournalAdmin, self). get_actions(request)
-        if request.user.is_superuser:
+
+        group_names = [group.name for group in request.user.groups.all()]
+        if request.user.is_superuser or GROUP_EDITOR in group_names:
             return self.readonly_fields
         else:
             return list(set(

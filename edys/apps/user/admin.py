@@ -47,11 +47,14 @@ class UserAdmin(_UserAdmin):
 
 
     def get_queryset(self, request):
-        group_names = [group.name for group in request.user.groups.all()]
         qs = super(UserAdmin, self).get_queryset(request)
 
-        if not request.user.is_superuser or GROUP_EDITOR in group_names:
-            qs = qs.filter(pk=request.user.id)
+        if not request.user.is_superuser:
+            qs = qs.exclude(is_superuser=True)
+
+            group_names = [group.name for group in request.user.groups.all()]
+            if not GROUP_EDITOR in group_names:
+                qs = qs.filter(pk=request.user.id)
 
         return qs
 
@@ -65,10 +68,8 @@ class UserAdmin(_UserAdmin):
             pass
 
     def delete_selected(self, request, obj):
-        group_names = [group.name for group in request.user.groups.all()]
-
         for user in obj.all():
-            if not user.is_superuser or GROUP_EDITOR in group_names:
+            if not user.is_superuser:
                 user.delete()
 
     delete_selected.short_description = _("Delete selected Users")
@@ -77,7 +78,7 @@ class UserAdmin(_UserAdmin):
         group_names = [group.name for group in request.user.groups.all()]
         actions = super(UserAdmin, self).get_actions(request)
 
-        if not request.user.is_superuser or GROUP_EDITOR in group_names:
+        if not request.user.is_superuser and not GROUP_EDITOR in group_names:
             del actions['delete_selected']
 
         return actions
@@ -99,11 +100,11 @@ class UserAdmin(_UserAdmin):
     def get_fieldsets(self, request, obj=None):
         fieldsets = super(UserAdmin, self).get_fieldsets(request, obj)
 
+        group_names = [group.name for group in request.user.groups.all()]
+
         custom_fieldsets = deepcopy(fieldsets)
 
-        if not request.user.is_superuser:
-
-            group_names = [group.name for group in request.user.groups.all()]
+        if not request.user.is_superuser and not GROUP_EDITOR in group_names:
 
             if obj == request.user:
                 custom_fieldsets = [field for field in custom_fieldsets if field[0] != _('Permissions')]
