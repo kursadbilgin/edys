@@ -1,8 +1,18 @@
-#Django
+# Django
 from django.utils.translation import ugettext_lazy as _
 
-#Group
+
+# USER
+USER_DEFAULT, USER_EDITOR, USER_ASSIGNEDEDITOR, USER_REVIEWER = (0, 1, 2, 3)
+USER_TYPES = (
+    (USER_DEFAULT, _('Default')),
+    (USER_EDITOR, ('Editor')),
+    (USER_ASSIGNEDEDITOR, _('Assigned Editor')),
+    (USER_REVIEWER, _('Reviewer'))
+)
+
+# Group
 GROUP_DEFAULT = 'Default'
-GROUP_EDITOR = 'Editör'
-GROUP_ASSIGNEDEDITOR = 'Assigned Editör'
-GROUP_REVIWER = 'Reviwer'
+GROUP_EDITOR = 'Editor'
+GROUP_ASSIGNEDEDITOR = 'Assigned Editor'
+GROUP_REVIEWER = 'Reviewer'

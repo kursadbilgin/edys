@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from core.models import Interest
 
 
+@admin.register(Interest)
 class InterestAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
@@ -18,6 +19,3 @@ class InterestAdmin(admin.ModelAdmin):
             exclude_fields = ['create_date', 'update_date']
 
         return [field for field in fields if field not in exclude_fields]
-
-
-admin.site.register(Interest, InterestAdmin)

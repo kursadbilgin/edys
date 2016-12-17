@@ -9,22 +9,17 @@ from journal.models import Journal, Article, ArticleDocument
 # Api
 from api.serializers import UserSerializer, JournalSerializer
 
-###     User     ###
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-########################
-
-
-###     Journal     ###
 
 class JournalViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Journal.objects.all()
     serializer_class = JournalSerializer
 
-####################
+
 
 LIST = (
      (r'user', UserViewSet),

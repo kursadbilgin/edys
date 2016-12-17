@@ -6,8 +6,8 @@ from django.utils.translation import ugettext_lazy as _
 from journal.models import Journal, Article, ArticleDocument
 from core.variables import GROUP_EDITOR
 
-###     Journal     ###
 
+@admin.register(Journal)
 class JournalAdmin(admin.ModelAdmin):
     list_display = ('name',)
     search_fields = ('name',)
@@ -47,25 +47,12 @@ class JournalAdmin(admin.ModelAdmin):
                 [field.name for field in self.opts.local_many_to_many]
             ))
 
-#############################
 
-
-###     Article     ###
-
+@admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('name', 'title')
 
 
-#############################
-
-
-###     Article Document     ###
-
+@admin.register(ArticleDocument)
 class ArticleDocumentAdmin(admin.ModelAdmin):
     list_display = ('description', 'document')
-
-#############################
-
-admin.site.register(Journal, JournalAdmin)
-admin.site.register(Article, ArticleAdmin)
-admin.site.register(ArticleDocument, ArticleDocumentAdmin)

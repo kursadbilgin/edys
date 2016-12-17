@@ -33,6 +33,7 @@ router = routers.DefaultRouter()
 for api in LIST:
     router.register(api[0], api[1])
 
+
 urlpatterns = [
 
     # Default

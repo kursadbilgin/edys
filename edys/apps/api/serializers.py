@@ -6,7 +6,6 @@ from user.models import User
 from core.models import Interest
 from journal.models import Journal, Article, ArticleDocument
 
-###     User     ###
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -14,10 +13,6 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('first_name', 'last_name')
 
-####################
-
-
-###     Interest     ###
 
 class InterestSerializer(serializers.ModelSerializer):
 
@@ -25,10 +20,6 @@ class InterestSerializer(serializers.ModelSerializer):
         model = Interest
         fields = ('name',)
 
-####################
-
-
-###     Article Document     ###
 
 class ArticleDocumentSerializer(serializers.ModelSerializer):
 
@@ -36,10 +27,6 @@ class ArticleDocumentSerializer(serializers.ModelSerializer):
         model = ArticleDocument
         fields = ('description', 'document')
 
-####################
-
-
-###     Article     ###
 
 class ArticleSerializer(serializers.ModelSerializer):
     article_documents = ArticleDocumentSerializer(read_only=True, many=True)
@@ -48,10 +35,6 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = Article
         fields = ('name', 'article_documents')
 
-####################
-
-
-###     Journal     ###
 
 class JournalSerializer(serializers.ModelSerializer):
     article = ArticleSerializer(read_only=True, many=True)
@@ -59,5 +42,3 @@ class JournalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Journal
         fields = ('name', 'article')
-
-####################
