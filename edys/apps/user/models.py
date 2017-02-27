@@ -7,11 +7,13 @@ from django.contrib.auth.models import (
 )
 
 # Local Django
+from core.models import DateModel
 from core.variables import (
     USER_TYPES,
     USER_DEFAULT, USER_EDITOR,
     USER_ASSIGNEDEDITOR, USER_REVIEWER
 )
+
 
 
 class UserManager(BaseUserManager):
@@ -56,15 +58,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     affiliation = models.CharField(verbose_name=_('Affiliation'),
                                    max_length=100)
     country = models.CharField(verbose_name=_('Country'), max_length=100,
-                                blank=True, unique=True)
+                                blank=True, null=True)
     is_active = models.BooleanField(verbose_name=_('Active'), default=True)
     is_staff = models.BooleanField(verbose_name=_('Staff'), default=True)
-    is_developer = models.BooleanField(verbose_name=_('Developer'),
-                                       default=False)
-    is_editor = models.BooleanField(verbose_name=_('Editor'), default=False)
-    is_assigned_editor = models.BooleanField(verbose_name=_('Assigned Editor'),
-                                             default=False)
-    is_reviewer = models.BooleanField(verbose_name=_('Reviewer'), default=False)
 
     objects = UserManager()
 
@@ -85,6 +81,19 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.first_name
+
+
+class Interest(DateModel):
+    name = models.CharField(verbose_name=_('Name'), max_length=75, blank=True,
+                            unique=True)
+    user = models.ForeignKey(verbose_name=('User'), to=User)
+
+    class Meta:
+        verbose_name = _(u'Interest')
+        verbose_name_plural = _(u'Interests')
+
+    def __str__(self):
+        return self.name
 
 
 # Proxy User Model -> Default

@@ -8,12 +8,18 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.admin import UserAdmin as _UserAdmin
 
 # Local Django
-from user.models import User
 from user.forms import UserChangeForm
+from user.models import User, Interest
 from core.variables import GROUP_DEFAULT, GROUP_EDITOR
 
 
+class InterestInline(admin.StackedInline):
+    model = Interest
+    extra = 0
+
+
 class UserAdminMixin(_UserAdmin):
+    inlines = (InterestInline,)
     fieldsets = (
         (_(u'Base Informations'), {
             'fields' : ('email', 'password'),
@@ -28,8 +34,7 @@ class UserAdminMixin(_UserAdmin):
             'fields' : ('is_active',),
         }),
         (_(u'Secret Permissions'), {
-            'fields' : ('is_reviewer', 'is_assigned_editor', 'is_editor',
-                        'is_developer', 'is_staff', 'is_superuser'),
+            'fields' : ('is_staff', 'is_superuser'),
         }),
         (_(u'Groups'), {
             'fields' : ('groups', 'user_permissions'),
@@ -47,10 +52,8 @@ class UserAdminMixin(_UserAdmin):
     form = UserChangeForm
 
     list_display = ('first_name', 'last_name', 'email', 'is_active',
-                    'is_reviewer', 'is_assigned_editor', 'is_editor',
-                    'is_developer', 'is_staff', 'is_superuser')
-    list_filter = ('is_reviewer', 'is_assigned_editor', 'is_editor',
-                   'is_developer', 'is_staff', 'is_superuser')
+                    'is_staff', 'is_superuser')
+    list_filter = ('is_staff', 'is_superuser')
     search_fields = ('email', 'first_name', 'last_name')
     readonly_fields = ('last_login',)
     ordering = ('first_name', 'last_name')
@@ -60,7 +63,7 @@ class UserAdminMixin(_UserAdmin):
 
         custom_fieldsets = deepcopy(fieldsets)
 
-        if not request.user.is_superuser and not request.user.is_editor:
+        if not request.user.is_superuser or not GROUP_EDITOR:
             exclude_fieldsets = [ _('Permissions'), _('Secret Permissions'),
                                  _('Groups')]
 
@@ -76,14 +79,14 @@ class UserAdminMixin(_UserAdmin):
         if not request.user.is_superuser:
             qs = qs.exclude(is_superuser=True)
 
-            if not request.user.is_editor:
+            if not GROUP_EDITOR:
                 qs = qs.filter(pk=request.user.id)
 
         return qs
 
     def delete_selected(self, request, obj):
         for user in obj.all():
-            if not user.is_superuser:
+            if not user.is_superuser or not GROUP_EDITOR:
                 user.delete()
 
     delete_selected.short_description = _("Delete selected Users")
@@ -91,19 +94,19 @@ class UserAdminMixin(_UserAdmin):
     def get_actions(self, request):
         actions = super(UserAdminMixin, self).get_actions(request)
 
-        if not request.user.is_superuser and not request.user.is_editor:
+        if not request.user.is_superuser or not GROUP_EDITOR:
             del actions['delete_selected']
 
         return actions
 
     def has_add_permission(self, request):
-        if request.user.is_superuser or request.user.is_editor:
+        if request.user.is_superuser or GROUP_EDITOR:
             return True
         else:
             return False
 
     def has_delete_permission(self, request, obj=None):
-        if request.user.is_superuser or request.user.is_editor:
+        if request.user.is_superuser or GROUP_EDITOR:
             return True
         else:
             return False
