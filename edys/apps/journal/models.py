@@ -11,8 +11,8 @@ from core.models import DateModel
 
 
 class Journal(DateModel):
+    user = models.ForeignKey(verbose_name=_('User'), to=User)
     name = models.CharField(verbose_name=_('Name'), max_length=50)
-    period = models.CharField(verbose_name=_('Period'), max_length=100)
     content = models.CharField(verbose_name=_('Content'), max_length=200)
 
     class Meta:
@@ -22,9 +22,23 @@ class Journal(DateModel):
     def __str__(self):
         return self.name
 
+class Period(DateModel):
+    period = models.CharField(verbose_name=_('Period'), max_length=100)
+    user = models.ForeignKey(verbose_name=_('User'), to=User)
+    journal = models.ForeignKey(verbose_name=_('Journal'), to=Journal)
+
+    class Meta:
+        verbose_name=_(u'Period')
+        verbose_name_plural=_(u'Periods')
+
+    def __str__(self):
+        return self.period
+
 
 class Article(DateModel):
-    journal = models.ForeignKey(verbose_name=_('Journal'), to=Journal,
+    user = models.ForeignKey(verbose_name=_('User'), to=User)
+    journal = models.ForeignKey(verbose_name=_('Journal'), to=Journal)
+    period = models.ForeignKey(verbose_name=_('Period'), to=Period,
                                 related_name='article')
     title = models.CharField(verbose_name=_('Title'), max_length=100)
     name = models.CharField(verbose_name=_('Name'), max_length=50)

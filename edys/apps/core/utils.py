@@ -24,17 +24,22 @@ def default():
     user_permissions = [
         p for p in Permission.objects.filter(
             Q(content_type__app_label__in=['user'])
-            & Q(codename__icontains='user')
+            & Q(codename__icontains='userdefault')
         )
     ]
 
-    create_group(GROUP_DEFAULT, user_permissions)
+    journal_permissions = [
+        p for p in Permission.objects.filter(
+            Q(content_type__app_label__in=['journal'])
+        )
+    ]
+
+    create_group(GROUP_DEFAULT, (journal_permissions + user_permissions))
 
 def editor():
     user_permissions = [
         p for p in Permission.objects.filter(
             Q(content_type__app_label__in=['user'])
-            & Q(codename__icontains='user')
         )
     ]
 
@@ -51,7 +56,7 @@ def assigned_editor():
     user_permissions = [
         p for p in Permission.objects.filter(
             Q(content_type__app_label__in=['user'])
-            & Q(codename__icontains='user')
+            & Q(codename__icontains='userassignededitor')
         )
     ]
 
@@ -68,7 +73,7 @@ def reviewer():
     user_permissions = [
         p for p in Permission.objects.filter(
             Q(content_type__app_label__in=['user'])
-            & Q(codename__icontains='user')
+            & Q(codename__icontains='userreviewer')
         )
     ]
 

@@ -11,15 +11,3 @@ class DateModel(models.Model):
 
     class Meta:
         abstract = True
-
-
-class Interest(DateModel):
-    name = models.CharField(verbose_name=_('Name'), max_length=75, blank=True,
-                            unique=True)
-
-    class Meta:
-        verbose_name = _(u'Interest')
-        verbose_name_plural = _(u'Interests')
-
-    def __str__(self):
-        return self.name
