@@ -6,12 +6,12 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 # Local Django
-from user.models import User
+from user.models import User, UserEditor
 from core.models import DateModel
 
 
 class Journal(DateModel):
-    user = models.ForeignKey(verbose_name=_('User'), to=User)
+    users = models.ManyToManyField(verbose_name=_('User'), to=UserEditor)
     name = models.CharField(verbose_name=_('Name'), max_length=50)
     content = models.CharField(verbose_name=_('Content'), max_length=200)
 
@@ -21,6 +21,10 @@ class Journal(DateModel):
 
     def __str__(self):
         return self.name
+
+    def get_users(self):
+        return ",".join([str(users) for users in self.users.all()])
+
 
 class Period(DateModel):
     period = models.CharField(verbose_name=_('Period'), max_length=100)
@@ -38,8 +42,7 @@ class Period(DateModel):
 class Article(DateModel):
     user = models.ForeignKey(verbose_name=_('User'), to=User)
     journal = models.ForeignKey(verbose_name=_('Journal'), to=Journal)
-    period = models.ForeignKey(verbose_name=_('Period'), to=Period,
-                                related_name='article')
+    period = models.ForeignKey(verbose_name=_('Period'), to=Period)
     title = models.CharField(verbose_name=_('Title'), max_length=100)
     name = models.CharField(verbose_name=_('Name'), max_length=50)
     abstract = models.TextField(verbose_name=_('Abstract'), max_length=300)
@@ -57,12 +60,13 @@ def set_upload_document_path(instance, filename):
 
 
 class ArticleDocument(DateModel):
-    description = models.CharField(verbose_name=_('Description'), max_length=100,
-                                   null=True)
-    document = models.FileField(verbose_name=_('Document'),
-                                upload_to=set_upload_document_path)
-    article = models.ForeignKey(verbose_name=_('Article'), to=Article,
-                                related_name='article_documents')
+    description = models.CharField(
+        verbose_name=_('Description'), max_length=100,null=True
+    )
+    document = models.FileField(
+        verbose_name=_('Document'),upload_to=set_upload_document_path
+    )
+    article = models.ForeignKey(verbose_name=_('Article'), to=Article)
 
     class Meta:
         verbose_name = _(u'Article Document')

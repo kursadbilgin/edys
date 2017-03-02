@@ -15,7 +15,6 @@ from core.variables import (
 )
 
 
-
 class UserManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, password=None):
         if not email:
@@ -48,17 +47,20 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    user_type = models.PositiveSmallIntegerField(verbose_name=_('User Type'),
-                                                 choices=USER_TYPES,
-                                                 default=USER_DEFAULT)
-    email = models.EmailField(verbose_name=_('Email'), max_length=255,
-                              unique=True)
+    user_type = models.PositiveSmallIntegerField(
+        verbose_name=_('User Type'),choices=USER_TYPES,default=USER_DEFAULT
+    )
+    email = models.EmailField(
+        verbose_name=_('Email'), max_length=255,unique=True
+    )
     first_name = models.CharField(verbose_name=_('First Name'), max_length=50)
     last_name = models.CharField(verbose_name=_('Last Name'), max_length=50)
-    affiliation = models.CharField(verbose_name=_('Affiliation'),
-                                   max_length=100)
-    country = models.CharField(verbose_name=_('Country'), max_length=100,
-                                blank=True, null=True)
+    affiliation = models.CharField(
+        verbose_name=_('Affiliation'),max_length=100
+    )
+    country = models.CharField(
+        verbose_name=_('Country'), max_length=100,blank=True, null=True
+    )
     is_active = models.BooleanField(verbose_name=_('Active'), default=True)
     is_staff = models.BooleanField(verbose_name=_('Staff'), default=True)
 
@@ -84,8 +86,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Interest(DateModel):
-    name = models.CharField(verbose_name=_('Name'), max_length=75, blank=True,
-                            unique=True)
+    name = models.CharField(
+        verbose_name=_('Name'), max_length=75, blank=True,unique=True
+    )
     user = models.ForeignKey(verbose_name=('User'), to=User)
 
     class Meta:
@@ -99,7 +102,9 @@ class Interest(DateModel):
 # Proxy User Model -> Default
 class UserDefaultModelManager(models.Manager):
     def get_queryset(self):
-        return super(UserDefaultModelManager, self).get_queryset().filter(user_type=USER_DEFAULT)
+        return super(
+            UserDefaultModelManager, self).get_queryset().filter(user_type=USER_DEFAULT
+        )
 
 
 class UserDefault(User):
@@ -118,7 +123,9 @@ class UserDefault(User):
 # Proxy User Model -> Editor
 class UserEditorModelManager(models.Manager):
     def get_queryset(self):
-        return super(UserEditorModelManager, self).get_queryset().filter(user_type=USER_EDITOR)
+        return super(
+            UserEditorModelManager, self).get_queryset().filter(user_type=USER_EDITOR
+        )
 
 
 class UserEditor(User):
@@ -137,7 +144,9 @@ class UserEditor(User):
 # Proxy User Model -> Assigned Editor
 class UserAssignedEditorModelManager(models.Manager):
     def get_queryset(self):
-        return super(UserAssignedEditorModelManager, self).get_queryset().filter(user_type=USER_ASSIGNEDEDITOR)
+        return super(
+            UserAssignedEditorModelManager, self).get_queryset().filter(user_type=USER_ASSIGNEDEDITOR
+        )
 
 
 class UserAssignedEditor(User):
@@ -156,7 +165,9 @@ class UserAssignedEditor(User):
 # Proxy User Model -> Reviewer
 class UserReviewerModelManager(models.Manager):
     def get_queryset(self):
-        return super(UserReviewerModelManager, self).get_queryset().filter(user_type=USER_REVIEWER)
+        return super(
+            UserReviewerModelManager, self).get_queryset().filter(user_type=USER_REVIEWER
+        )
 
 
 class UserReviewer(User):

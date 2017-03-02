@@ -42,9 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'edys',
 
-    # External Applications
-    'rest_framework',
-
     # Internal Applications
     'core',
     'user',
@@ -115,5 +112,5 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(PACKAGE_ROOT, 'static/')
 
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+MEDIA_URL = "/media/articles/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/articles")

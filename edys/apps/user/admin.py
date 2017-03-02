@@ -7,8 +7,8 @@ from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
 
 # Local Django
-from user.models import Interest
 from user.actions import *
+from user.models import Interest
 from user.mixins import UserAdminMixin
 from user.models import (
     UserDefault, UserEditor, UserAssignedEditor, UserReviewer
@@ -32,7 +32,6 @@ class UserDefaultAdmin(UserAdminMixin):
             pass
 
 
-
 @admin.register(UserEditor)
 class UserEditorAdmin(UserAdminMixin):
     actions = [make_assignededitor, make_reviewer, make_default]
@@ -45,7 +44,6 @@ class UserEditorAdmin(UserAdminMixin):
             group.user_set.add(obj)
         except Group.DoesNotExist:
             pass
-
 
 
 @admin.register(UserAssignedEditor)
