@@ -102,9 +102,7 @@ class Interest(DateModel):
 # Proxy User Model -> Default
 class UserDefaultModelManager(models.Manager):
     def get_queryset(self):
-        return super(
-            UserDefaultModelManager, self).get_queryset().filter(user_type=USER_DEFAULT
-        )
+        return super(UserDefaultModelManager, self).get_queryset().filter(user_type=USER_DEFAULT)
 
 
 class UserDefault(User):
@@ -123,9 +121,7 @@ class UserDefault(User):
 # Proxy User Model -> Editor
 class UserEditorModelManager(models.Manager):
     def get_queryset(self):
-        return super(
-            UserEditorModelManager, self).get_queryset().filter(user_type=USER_EDITOR
-        )
+        return super(UserEditorModelManager, self).get_queryset().filter(user_type=USER_EDITOR)
 
 
 class UserEditor(User):
@@ -144,9 +140,7 @@ class UserEditor(User):
 # Proxy User Model -> Assigned Editor
 class UserAssignedEditorModelManager(models.Manager):
     def get_queryset(self):
-        return super(
-            UserAssignedEditorModelManager, self).get_queryset().filter(user_type=USER_ASSIGNEDEDITOR
-        )
+        return super(UserAssignedEditorModelManager, self).get_queryset().filter(user_type=USER_ASSIGNEDEDITOR)
 
 
 class UserAssignedEditor(User):
@@ -165,9 +159,7 @@ class UserAssignedEditor(User):
 # Proxy User Model -> Reviewer
 class UserReviewerModelManager(models.Manager):
     def get_queryset(self):
-        return super(
-            UserReviewerModelManager, self).get_queryset().filter(user_type=USER_REVIEWER
-        )
+        return super(UserReviewerModelManager, self).get_queryset().filter(user_type=USER_REVIEWER)
 
 
 class UserReviewer(User):

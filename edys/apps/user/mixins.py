@@ -11,11 +11,6 @@ from django.contrib.auth.admin import UserAdmin as _UserAdmin
 from user.forms import UserChangeForm
 from user.models import User, Interest
 from core.variables import GROUP_DEFAULT, GROUP_EDITOR
-from core.variables import (
-    USER_TYPES,
-    USER_DEFAULT, USER_EDITOR,
-    USER_ASSIGNEDEDITOR, USER_REVIEWER
-)
 
 
 class InterestInline(admin.StackedInline):
@@ -67,8 +62,9 @@ class UserAdminMixin(_UserAdmin):
         fieldsets = super(UserAdminMixin, self).get_fieldsets(request, obj)
 
         custom_fieldsets = deepcopy(fieldsets)
+        group_names = [group.name for group in request.user.groups.all()]
 
-        if not request.user.is_superuser and not request.user.user_type==USER_EDITOR:
+        if not request.user.is_superuser and not GROUP_EDITOR in group_names:
             exclude_fieldsets = [ _('Permissions'), _('Secret Permissions'),
                                  _('Groups')]
 
@@ -84,34 +80,39 @@ class UserAdminMixin(_UserAdmin):
         if not request.user.is_superuser:
             qs = qs.exclude(is_superuser=True)
 
-            if not request.user.user_type==USER_EDITOR:
+            group_names = [group.name for group in request.user.groups.all()]
+            if not GROUP_EDITOR in group_names:
                 qs = qs.filter(pk=request.user.id)
 
         return qs
 
+    def delete_selected(self, request, obj):
+        group_names = [group.name for group in request.user.groups.all()]
+        for user in obj.all():
+            if not user.is_superuser or not GROUP_EDITOR in group_names:
+                user.delete()
+
+    delete_selected.short_description = _("Delete selected Users")
+
+    def get_actions(self, request, obj=None):
+        actions = super(UserAdminMixin, self).get_actions(request)
+        group_names = [group.name for group in request.user.groups.all()]
+
+        if not request.user.is_superuser and not GROUP_EDITOR in group_names:
+            actions = []
+
+        return actions
+
     def has_add_permission(self, request):
-        if request.user.is_superuser or request.user.user_type==USER_EDITOR:
+        group_names = [group.name for group in request.user.groups.all()]
+        if request.user.is_superuser or GROUP_EDITOR in group_names:
             return True
         else:
             return False
 
     def has_delete_permission(self, request, obj=None):
-        if request.user.is_superuser or request.user.user_type==USER_EDITOR:
+        group_names = [group.name for group in request.user.groups.all()]
+        if request.user.is_superuser or GROUP_EDITOR in group_names:
             return True
         else:
             return False
-
-    def get_actions(self, request):
-        actions = super(UserAdminMixin, self).get_actions(request)
-
-        if not request.user.is_superuser and not request.user.user_type==USER_EDITOR:
-            del actions['delete_selected']
-
-        return actions
-
-    def delete_selected(self, request, obj):
-        for user in obj.all():
-            if not user.is_superuser and not request.user.user_type==USER_EDITOR:
-                user.delete()
-
-    delete_selected.short_description = _("Delete selected Users")
