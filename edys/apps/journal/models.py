@@ -3,6 +3,7 @@ import os
 
 # Django
 from django.db import models
+from ckeditor.fields import RichTextField
 from django.utils.translation import ugettext_lazy as _
 
 # Local Django
@@ -27,7 +28,7 @@ class Journal(DateModel):
 
 
 class Period(DateModel):
-    period = models.CharField(verbose_name=_('Period'), max_length=100)
+    period = models.PositiveSmallIntegerField(verbose_name=_('Period'))
     user = models.ForeignKey(verbose_name=_('User'), to=User)
     journal = models.ForeignKey(verbose_name=_('Journal'), to=Journal)
 
@@ -36,7 +37,7 @@ class Period(DateModel):
         verbose_name_plural=_(u'Periods')
 
     def __str__(self):
-        return self.period
+        return str(self.period)
 
 
 class Article(DateModel):
@@ -45,7 +46,7 @@ class Article(DateModel):
     period = models.ForeignKey(verbose_name=_('Period'), to=Period)
     title = models.CharField(verbose_name=_('Title'), max_length=100)
     name = models.CharField(verbose_name=_('Name'), max_length=50)
-    abstract = models.TextField(verbose_name=_('Abstract'), max_length=300)
+    abstract = RichTextField()
 
     class Meta:
         verbose_name = _(u'Article')

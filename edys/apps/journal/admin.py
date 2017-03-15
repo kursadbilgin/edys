@@ -33,6 +33,14 @@ class JournalAdmin(admin.ModelAdmin):
 
         return [field for field in fields if field not in exclude_fields]
 
+    def get_queryset(self, request):
+        qs = super(JournalAdmin, self).get_queryset(request)
+
+        if not request.user.is_superuser:
+            qs = qs.filter(users=request.user)
+
+        return qs
+
     def has_add_permission(self, request):
         if request.user.is_superuser or request.user.user_type==USER_EDITOR:
             return True
@@ -84,6 +92,20 @@ class PeriodAdmin(admin.ModelAdmin):
             exclude_fields.append('user')
 
         return [field for field in fields if field not in exclude_fields]
+
+    def get_queryset(self, request):
+        qs = super(PeriodAdmin, self).get_queryset(request)
+
+        if not request.user.is_superuser:
+            qs = qs.filter(user=request.user)
+
+        return qs
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "journal" and not request.user.is_superuser:
+            kwargs["queryset"] = Journal.objects.filter(users=request.user)
+
+        return super(PeriodAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
     def has_add_permission(self, request):
         if request.user.is_superuser or request.user.user_type==USER_EDITOR:
@@ -140,8 +162,8 @@ class ArticleAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(ArticleAdmin, self).get_queryset(request)
 
-        if not request.user.is_superuser and not request.user.user_type==USER_EDITOR:
-            qs = qs.filter(pk=request.user.id)
+        if not request.user.is_superuser:
+            qs = qs.filter(user=request.user)
 
         return qs
 
@@ -159,7 +181,7 @@ class ArticleDocumentAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(ArticleDocumentAdmin, self).get_queryset(request)
 
-        if not request.user.is_superuser or not request.user.user_type==USER_EDITOR:
-            qs = qs.filter(article__journal__user=request.user.id)
+        if not request.user.is_superuser and not request.user.user_type==USER_EDITOR:
+            qs = qs.filter(article__journal__users=request.user.id)
 
         return qs
