@@ -6,6 +6,7 @@ from django.contrib.admin.templatetags.admin_modify import submit_row as origina
 
 # Local Django
 from user.models import User
+from .forms import ArticleForm
 from journal.models import Journal, Period, Article, ArticleDocument
 from core.variables import GROUP_EDITOR
 from core.variables import (
@@ -174,6 +175,7 @@ class PeriodAdmin(admin.ModelAdmin):
 class ArticleAdmin(admin.ModelAdmin):
     list_display = ('name', 'title', 'journal', 'period', 'user')
     inlines = (ArticleDocumentInline,)
+    form = ArticleForm
 
     def get_fields(self, request, *args, **kwargs):
         fields = super(ArticleAdmin, self). get_fields(request, *args, **kwargs)
@@ -181,6 +183,9 @@ class ArticleAdmin(admin.ModelAdmin):
         exclude_fields = []
         if not request.user.is_superuser or not request.user.user_type==USER_EDITOR:
             exclude_fields.append('user')
+
+        if not request.user.is_superuser:
+            exclude_fields.append('period')
 
         return [field for field in fields if field not in exclude_fields]
 
@@ -195,6 +200,9 @@ class ArticleAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if not request.user.is_superuser or not request.user.user_type==USER_EDITOR:
             obj.user = request.user
+        if not request.user.is_superuser:
+            period = Period.objects.get()
+            obj.period = period
 
         obj.save()
 
