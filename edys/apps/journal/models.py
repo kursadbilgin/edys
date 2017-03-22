@@ -42,10 +42,17 @@ class Period(DateModel):
 
 class Article(DateModel):
     user = models.ForeignKey(verbose_name=_('User'), to=User)
-    editors = models.ManyToManyField(verbose_name=_('Editors'), to=UserEditor, related_name='editors')
-    assigned_editors = models.ManyToManyField(verbose_name=_('Assigned Editors'), to=UserAssignedEditor, related_name='assigned_editors')
-    reviewers = models.ManyToManyField(verbose_name=_('Reviewers'), to=UserReviewer, related_name='reviewers')
     journal = models.ForeignKey(verbose_name=_('Journal'), to=Journal)
+    editors = models.ManyToManyField(
+        verbose_name=_('Editors'), to=UserEditor, related_name='editors'
+    )
+    assigned_editors = models.ManyToManyField(
+        verbose_name=_('Assigned Editors'), to=UserAssignedEditor,
+        related_name='assigned_editors'
+    )
+    reviewers = models.ManyToManyField(
+        verbose_name=_('Reviewers'), to=UserReviewer, related_name='reviewers'
+        )
     period = models.ForeignKey(verbose_name=_('Period'), to=Period)
     title = models.CharField(verbose_name=_('Title'), max_length=100)
     name = models.CharField(verbose_name=_('Name'), max_length=50)

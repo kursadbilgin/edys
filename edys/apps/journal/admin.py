@@ -1,5 +1,6 @@
 # Django
 from django.contrib import admin
+from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin.templatetags.admin_modify import *
 from django.contrib.admin.templatetags.admin_modify import submit_row as original_submit_row
@@ -79,14 +80,14 @@ class JournalAdmin(admin.ModelAdmin):
 
         obj.save()
 
-        def get_readonly_fields(self, request, obj=None):
-            actions = super(JournalAdmin, self). get_actions(request)
+    def get_readonly_fields(self, request, obj=None):
+        actions = super(JournalAdmin, self). get_actions(request)
 
-            if request.user.is_superuser or request.user.user_type==USER_EDITOR:
-                return self.readonly_fields
-            else:
-                readonly_fields = ['users', 'name', 'content']
-                return readonly_fields
+        if request.user.is_superuser or request.user.user_type==USER_EDITOR:
+            return self.readonly_fields
+        else:
+            readonly_fields = ['users', 'name', 'content']
+            return readonly_fields
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         if not request.user.is_superuser and not request.user.user_type==USER_EDITOR:
@@ -186,6 +187,12 @@ class ArticleAdmin(admin.ModelAdmin):
 
         if not request.user.is_superuser:
             exclude_fields.append('period')
+
+        if request.user.user_type==USER_DEFAULT or request.user.user_type==USER_REVIEWER:
+            exclude_fields.append('assigned_editors') or exclude_fields.append('reviewers')
+
+        if request.user.user_type==USER_ASSIGNEDEDITOR:
+            exclude_fields.append('assigned_editors')
 
         return [field for field in fields if field not in exclude_fields]
 

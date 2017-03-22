@@ -12,7 +12,7 @@ USER_TYPES = (
 )
 
 # Group
-GROUP_DEFAULT = _('Default')
-GROUP_EDITOR = ('Editor')
-GROUP_ASSIGNEDEDITOR = _('Assigned Editor')
-GROUP_REVIEWER = _('Reviewer')
+GROUP_DEFAULT = 'Default'
+GROUP_EDITOR = 'Editor'
+GROUP_ASSIGNEDEDITOR = 'Assigned Editor'
+GROUP_REVIEWER = 'Reviewer'
