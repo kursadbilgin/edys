@@ -30,6 +30,8 @@ class ArticleDocumentInline(admin.StackedInline):
     model = ArticleDocument
     extra = 0
     min_num = 1
+    verbose_name = _('Document')
+    verbose_name_plural = _('Documents')
 
 
 @admin.register(Journal)
