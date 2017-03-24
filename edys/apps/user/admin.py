@@ -1,44 +1,90 @@
+# Standard Library
+from copy import deepcopy
+
 # Django
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin as _UserAdmin
+from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
 
 # Local Django
-from user.models import User
-from user.forms import UserChangeForm
-
-class UserAdmin(_UserAdmin):
-    fieldsets = (
-        (_(u'Base Informations'), {
-            'fields' : ('email', 'password'),
-        }),
-        (_(u'Personal Informations'), {
-            'fields' : ('first_name', 'last_name')
-        }),
-        (_(u'Important Informations'), {
-            'fields' : ('last_login',)
-        }),
-        (_(u'Permissions'), {
-            'fields' : ('is_active', 'is_staff', 'is_developer', 'is_superuser', 'user_permissions')
-        }),
-    )
-
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('email', 'first_name', 'last_name', 'affiliation', 'country', 'password1', 'password2',
-                       'is_active', 'is_staff', 'is_developer')}
-        ),
-    )
-
-    form = UserChangeForm
-
-    list_display = ('first_name', 'last_name', 'email', 'is_active', 'is_staff',
-                    'is_developer', 'is_superuser')
-    list_filter = ('is_active', 'is_staff', 'is_developer')
-    search_fields = ('email', 'first_name', 'last_name')
-    readonly_fields = ('last_login',)
-    ordering = ('first_name', 'last_name')
+from user.actions import *
+from user.models import Interest
+from user.mixins import UserAdminMixin
+from user.models import (
+    UserDefault, UserEditor, UserAssignedEditor, UserReviewer
+)
+from core.variables import (
+    GROUP_DEFAULT, GROUP_EDITOR, GROUP_ASSIGNEDEDITOR, GROUP_REVIEWER
+)
 
 
-admin.site.register(User, UserAdmin)
+@admin.register(UserDefault)
+class UserDefaultAdmin(UserAdminMixin):
+    actions = [make_editor, make_assignededitor, make_reviewer]
+
+    def save_model(self, request, obj, form, change):
+        obj.save()
+
+        try:
+            group = Group.objects.get(name=GROUP_DEFAULT)
+            group.user_set.add(obj)
+        except Group.DoesNotExist:
+            pass
+
+
+@admin.register(UserEditor)
+class UserEditorAdmin(UserAdminMixin):
+    actions = [make_assignededitor, make_reviewer, make_default]
+
+    def save_model(self, request, obj, form, change):
+        obj.save()
+
+        try:
+            group = Group.objects.get(name=GROUP_EDITOR)
+            group.user_set.add(obj)
+        except Group.DoesNotExist:
+            pass
+
+
+@admin.register(UserAssignedEditor)
+class UserAssignedEditorAdmin(UserAdminMixin):
+    actions = [make_editor, make_reviewer, make_default]
+
+    def save_model(self, request, obj, form, change):
+        obj.save()
+
+        try:
+            group = Group.objects.get(name=GROUP_ASSIGNEDEDITOR)
+            group.user_set.add(obj)
+        except Group.DoesNotExist:
+            pass
+
+
+@admin.register(UserReviewer)
+class UserReviewerAdmin(UserAdminMixin):
+    actions = [make_editor, make_assignededitor, make_default]
+
+
+    def save_model(self, request, obj, form, change):
+        obj.save()
+
+        try:
+            group = Group.objects.get(name=GROUP_REVIEWER)
+            group.user_set.add(obj)
+        except Group.DoesNotExist:
+            pass
+
+
+@admin.register(Interest)
+class InterestAdmin(admin.ModelAdmin):
+    list_display = ('name', 'user')
+    search_fields = ('name', 'user')
+
+    def get_fields(self, request, *args, **kwargs):
+        fields = super(InterestAdmin, self).get_fields(request, *args, **kwargs)
+
+        exclude_fields = []
+        if 'add' in request.path.split('/'):
+            exclude_fields = ['create_date', 'update_date']
+
+        return [field for field in fields if field not in exclude_fields]

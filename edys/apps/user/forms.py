@@ -1,8 +1,8 @@
 # Django
 from django import forms
 from django.utils.html import format_html
-from django.contrib.auth.forms import UserChangeForm as _UserChangeForm
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.forms import UserChangeForm as _UserChangeForm
 
 
 class CustomReadOnlyPasswordHashWidget(forms.Widget):

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-26 00:17+0300\n"
+"POT-Creation-Date: 2017-03-08 12:11+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,49 +18,128 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: edys/apps/core/apps.py:7
+#: edys/apps/core/apps.py:8
 msgid "Core"
 msgstr "Genel"
 
-#: edys/apps/core/models.py:6
+#: edys/apps/core/models.py:8
 msgid "Create Date"
 msgstr "Oluşturulma Tarihi"
 
-#: edys/apps/core/models.py:7
+#: edys/apps/core/models.py:11
 msgid "Update Date"
 msgstr "Güncelleme Tarihi"
 
-#: edys/apps/core/models.py:14
+#: edys/apps/core/variables.py:8
+msgid "Default"
+msgstr "Varsayılan"
+
+#: edys/apps/core/variables.py:10 edys/apps/user/models.py:151
+msgid "Assigned Editor"
+msgstr "Atanan Editör"
+
+#: edys/apps/core/variables.py:11 edys/apps/user/models.py:170
+msgid "Reviewer"
+msgstr "Denetleyici"
+
+#: edys/apps/journal/apps.py:8 edys/apps/journal/models.py:19
+#: edys/apps/journal/models.py:32 edys/apps/journal/models.py:44
+msgid "Journal"
+msgstr "Dergi"
+
+#: edys/apps/journal/models.py:14 edys/apps/journal/models.py:31
+#: edys/apps/journal/models.py:43 edys/apps/user/apps.py:8
+#: edys/apps/user/models.py:73 edys/apps/user/models.py:113
+msgid "User"
+msgstr "Kullanıcı"
+
+#: edys/apps/journal/models.py:15 edys/apps/journal/models.py:47
+#: edys/apps/user/models.py:90
 msgid "Name"
 msgstr "İsim"
 
-#: edys/apps/core/models.py:17
-msgid "Interest"
-msgstr "İlgi"
+#: edys/apps/journal/models.py:16
+msgid "Content"
+msgstr "İçerik"
 
-#: edys/apps/core/models.py:18
-msgid "Interests"
-msgstr "İlgiler"
+#: edys/apps/journal/models.py:20
+msgid "Journals"
+msgstr "Dergiler"
 
-#: edys/apps/user/admin.py:12
-msgid "Base Informations"
-msgstr "Temel Bilgiler"
+#: edys/apps/journal/models.py:30 edys/apps/journal/models.py:35
+#: edys/apps/journal/models.py:45
+msgid "Period"
+msgstr "Periyot"
 
-#: edys/apps/user/admin.py:15
-msgid "Personal Informations"
-msgstr "Kişisel Bilgiler"
+#: edys/apps/journal/models.py:36
+msgid "Periods"
+msgstr "Periyotlar"
 
-#: edys/apps/user/admin.py:18
-msgid "Important Informations"
-msgstr "Önemli Bilgiler"
+#: edys/apps/journal/models.py:46
+msgid "Title"
+msgstr "Başlık"
 
-#: edys/apps/user/admin.py:21
-msgid "Permissions"
-msgstr "İzinler"
+#: edys/apps/journal/models.py:48
+msgid "Abstract"
+msgstr "Özet"
 
-#: edys/apps/user/apps.py:8 edys/apps/user/models.py:57
-msgid "User"
-msgstr "Kullanıcı"
+#: edys/apps/journal/models.py:51 edys/apps/journal/models.py:52
+#: edys/apps/journal/models.py:69
+msgid "Article"
+msgstr "Makale"
+
+#: edys/apps/journal/models.py:64
+msgid "Description"
+msgstr "Açıklama"
+
+#: edys/apps/journal/models.py:67
+msgid "Document"
+msgstr "Döküman"
+
+#: edys/apps/journal/models.py:72
+msgid "Article Document"
+msgstr "Makale Dökümanı"
+
+#: edys/apps/journal/models.py:73
+msgid "Article Documents"
+msgstr "Makale Dökümanları"
+
+#: edys/apps/user/actions.py:22
+msgid "Seçilen kullanıcı editör yapıldı."
+msgstr "The selected user was made an editor."
+
+#: edys/apps/user/actions.py:24 edys/apps/user/actions.py:37
+#: edys/apps/user/actions.py:50 edys/apps/user/actions.py:63
+msgid "Böyle bir grup bulunamadı"
+msgstr "No such group was found."
+
+#: edys/apps/user/actions.py:25
+msgid "Make selected editor"
+msgstr "Seçili Olanları Editör Yap"
+
+#: edys/apps/user/actions.py:35
+msgid "Seçilen kullanıcı atanan editör yapıldı."
+msgstr "The selected user was made an assigned editor."
+
+#: edys/apps/user/actions.py:38
+msgid "Make selected assigned editor"
+msgstr "Seçili olanları atanan editör yap"
+
+#: edys/apps/user/actions.py:48
+msgid "Seçilen kullanıcı denetleyici yapıldı."
+msgstr "The selected user was made a reviewer."
+
+#: edys/apps/user/actions.py:51
+msgid "Make selected reviewer"
+msgstr "Seçili olanları denetleyici yap"
+
+#: edys/apps/user/actions.py:61
+msgid "Seçilen kullanıcı normal kullanıcı yapıldı."
+msgstr "The selected user was made a default user."
+
+#: edys/apps/user/actions.py:64
+msgid "Make selected user"
+msgstr "Seçili olanları normal kullanıcı yap"
 
 #: edys/apps/user/forms.py:11
 msgid ""
@@ -73,46 +152,98 @@ msgstr ""
 msgid "Password"
 msgstr "Şifre"
 
-#: edys/apps/user/models.py:14
+#: edys/apps/user/mixins.py:23
+msgid "Base Informations"
+msgstr "Temel Bilgiler"
+
+#: edys/apps/user/mixins.py:26
+msgid "Personal Informations"
+msgstr "Kişisel Bilgiler"
+
+#: edys/apps/user/mixins.py:29
+msgid "Important Informations"
+msgstr "Önemli Bilgiler"
+
+#: edys/apps/user/mixins.py:32 edys/apps/user/mixins.py:68
+msgid "Permissions"
+msgstr "İzinler"
+
+#: edys/apps/user/mixins.py:35 edys/apps/user/mixins.py:68
+msgid "Secret Permissions"
+msgstr "Gizli İzinler"
+
+#: edys/apps/user/mixins.py:38 edys/apps/user/mixins.py:69
+msgid "Groups"
+msgstr "Gruplar"
+
+#: edys/apps/user/mixins.py:95
+msgid "Delete selected Users"
+msgstr "Seçili Kullanıcılar nesneleri sil"
+
+#: edys/apps/user/models.py:21
 msgid "Users must have email address."
 msgstr "Kullanıcılar e-posta adresi olmalıdır"
 
-#: edys/apps/user/models.py:28
+#: edys/apps/user/models.py:36
 msgid "Admins must have email address."
 msgstr "Yöneticilerin e-posta adresi olmalıdır"
 
-#: edys/apps/user/models.py:42
+#: edys/apps/user/models.py:51
+msgid "User Type"
+msgstr "Kullanıcı Tipi"
+
+#: edys/apps/user/models.py:54
 msgid "Email"
 msgstr "E-posta"
 
-#: edys/apps/user/models.py:43
+#: edys/apps/user/models.py:56
 msgid "First Name"
 msgstr "İsim"
 
-#: edys/apps/user/models.py:44
+#: edys/apps/user/models.py:57
 msgid "Last Name"
 msgstr "Soyisim"
 
-#: edys/apps/user/models.py:45
+#: edys/apps/user/models.py:59
 msgid "Affiliation"
 msgstr "Üyelik"
 
-#: edys/apps/user/models.py:46
+#: edys/apps/user/models.py:62
 msgid "Country"
 msgstr "Şehir"
 
-#: edys/apps/user/models.py:47
+#: edys/apps/user/models.py:64
 msgid "Active"
 msgstr "Aktif"
 
-#: edys/apps/user/models.py:48
+#: edys/apps/user/models.py:65
 msgid "Staff"
 msgstr "Çalışan"
 
-#: edys/apps/user/models.py:49
-msgid "Developer"
-msgstr "Geliştirici"
-
-#: edys/apps/user/models.py:58
+#: edys/apps/user/models.py:74 edys/apps/user/models.py:114
 msgid "Users"
 msgstr "Kullanıcılar"
+
+#: edys/apps/user/models.py:95
+msgid "Interest"
+msgstr "İlgi"
+
+#: edys/apps/user/models.py:96
+msgid "Interests"
+msgstr "İlgiler"
+
+#: edys/apps/user/models.py:132
+msgid "Editor"
+msgstr "Editör"
+
+#: edys/apps/user/models.py:133
+msgid "Editors"
+msgstr "Editörler"
+
+#: edys/apps/user/models.py:152
+msgid "Assigned Editors"
+msgstr "Atanan Editörler"
+
+#: edys/apps/user/models.py:171
+msgid "Reviewers"
+msgstr "Denetleyiciler"
