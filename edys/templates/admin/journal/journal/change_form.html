@@ -1,0 +1,28 @@
+{% extends 'admin/change_form.html' %}
+
+{% load i18n admin_urls static admin_modify %}
+
+
+{% block object-tools-items %}
+	<li>
+		<a class="open-popup" href="{% url 'admin:journal_article_changelist' %}?journal={{adminform.form.instance.id}}">{% trans 'Article' %}</a>
+	</li>
+{% endblock %}
+
+{% block content %}
+	{{block.super}}
+
+	<script type="text/javascript">
+	(function($){
+		$('.open-popup').click(function(e){
+			e.preventDefault();
+			wLeft = window.screenLeft ? window.screenLeft : window.screenX;
+		    wTop = window.screenTop ? window.screenTop : window.screenY;
+
+		    var left = wLeft + (window.innerWidth / 2) - (1000 / 2);
+		    var top = wTop + (window.innerHeight / 2) - (500 / 2);
+			window.open($(this).attr('href'), 'popup', 'height=500,width=1000,left='+left+',top='+top+',resizable=yes,scrollbars=yes');
+		});
+	})(django.jQuery);
+	</script>
+{% endblock %}

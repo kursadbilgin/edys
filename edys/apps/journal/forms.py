@@ -1,40 +1,39 @@
-#Django
+# Third-Party
+from redactor.widgets import RedactorEditor
+
+# Django
 from django import forms
-from django.contrib.auth.models import User
+from django.conf import settings
+from django.utils.html import format_html
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.contenttypes.models import ContentType
 
-#Local Django
-from journal.models import *
-from core.variables import (USER_TYPES, USER_EDITOR)
+# Local Django
+from journal.models import Journal, Article
 
-class CustomModelChoiceField(forms.ModelChoiceField):
-     def label_from_instance(self, obj):
-         try:
-             period = Period.objects.get(id=obj.id)
-             journals = period.journal
-             return "%s, %s" % (period, journals)
-         except:
-             return super(CustomModelChoiceField, self).label_from_instance(obj)
+class ArticleDocumentAdminForm(forms.ModelForm):
+    document = forms.FileField(label=_('Document'))
 
-class ModelMultipleChoiceField(forms.ModelChoiceField):
-     def label_from_instance(self, obj):
-         try:
-             editor = UserEditor.objects.get(id=obj.id)
-             journals = editor.journal_set.all()
-             journals_name = ', '.join([journal.name for journal in journals])
-             return "%s - %s" % (editor, journals_name)
-         except:
-             return super(ModelMultipleChoiceField, self).label_from_instance(obj)
+    def clean_document(self):
+         document = self.cleaned_data['document']
 
-class ArticleForm(forms.ModelForm):
-    period = CustomModelChoiceField(
-        queryset=Period.objects.all(), label=_("Period")
-    )
-    editors = ModelMultipleChoiceField(
-        queryset=User.objects.filter(user_type=USER_EDITOR), label=_("Editors"),
-        widget=forms.SelectMultiple
-    )
+         if 'document' in self.changed_data:
 
+             if document._size > max_file_size*1048576:
+                   raise ValidationError(_('Please keep filesize under.'))
+         return document
+
+
+class ArticleAdminForm(forms.ModelForm):
     class Meta:
-        fields = "__all__"
         model = Article
+        fields = '__all__'
+        widgets = {
+           'abstract': RedactorEditor(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(ArticleAdminForm, self).__init__(*args, **kwargs)
+        self.fields['editors'].queryset = self.instance.journal.editors.all()
+        self.fields['assigned_editors'].queryset = self.instance.journal.assigned_editors.all()

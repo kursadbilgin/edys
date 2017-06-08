@@ -3,10 +3,7 @@ from django.db.models import Q
 from django.contrib.auth.models import Permission, Group
 
 # Local Django
-from core.variables import (
-    GROUP_DEFAULT, GROUP_REVIEWER,
-    GROUP_EDITOR, GROUP_ASSIGNEDEDITOR
-)
+from core.variables import GROUP_DEFAULT, GROUP_ADMIN
 
 
 def create_group(group_name, permissions):
@@ -24,19 +21,23 @@ def default():
     user_permissions = [
         p for p in Permission.objects.filter(
             Q(content_type__app_label__in=['user'])
-            & Q(codename__icontains='userdefault')
+            & Q(codename__icontains='user')
         )
     ]
 
     journal_permissions = [
         p for p in Permission.objects.filter(
             Q(content_type__app_label__in=['journal'])
+            & Q(codename__icontains='journal')
+            | Q(codename__icontains='period')
+            | Q(codename__icontains='article')
+            | Q(codename__icontains='articleproxy')
         )
     ]
 
-    create_group(GROUP_DEFAULT, (journal_permissions + user_permissions))
+    create_group(GROUP_DEFAULT, (user_permissions + journal_permissions))
 
-def editor():
+def admin():
     user_permissions = [
         p for p in Permission.objects.filter(
             Q(content_type__app_label__in=['user'])
@@ -46,41 +47,11 @@ def editor():
     journal_permissions = [
         p for p in Permission.objects.filter(
             Q(content_type__app_label__in=['journal'])
+            & Q(codename__icontains='journal')
+            | Q(codename__icontains='period')
+            | Q(codename__icontains='article')
+            | Q(codename__icontains='articleproxy')
         )
     ]
 
-    create_group(GROUP_EDITOR, (user_permissions + journal_permissions))
-
-
-def assigned_editor():
-    user_permissions = [
-        p for p in Permission.objects.filter(
-            Q(content_type__app_label__in=['user'])
-            & Q(codename__icontains='userassignededitor')
-        )
-    ]
-
-    journal_permissions = [
-        p for p in Permission.objects.filter(
-            Q(content_type__app_label__in=['journal'])
-        )
-    ]
-
-    create_group(GROUP_ASSIGNEDEDITOR, (user_permissions + journal_permissions))
-
-
-def reviewer():
-    user_permissions = [
-        p for p in Permission.objects.filter(
-            Q(content_type__app_label__in=['user'])
-            & Q(codename__icontains='userreviewer')
-        )
-    ]
-
-    journal_permissions = [
-        p for p in Permission.objects.filter(
-            Q(content_type__app_label__in=['journal'])
-        )
-    ]
-
-    create_group(GROUP_REVIEWER, (user_permissions + journal_permissions))
+    create_group(GROUP_ADMIN, (user_permissions + journal_permissions))

@@ -8,11 +8,6 @@ from django.contrib.auth.models import (
 
 # Local Django
 from core.models import DateModel
-from core.variables import (
-    USER_TYPES,
-    USER_DEFAULT, USER_EDITOR,
-    USER_ASSIGNEDEDITOR, USER_REVIEWER
-)
 
 
 class UserManager(BaseUserManager):
@@ -47,11 +42,8 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    user_type = models.PositiveSmallIntegerField(
-        verbose_name=_('User Type'),choices=USER_TYPES,default=USER_DEFAULT
-    )
     email = models.EmailField(
-        verbose_name=_('Email'), max_length=255,unique=True
+        verbose_name=_('Email'), max_length=255, unique=True
     )
     first_name = models.CharField(verbose_name=_('First Name'), max_length=50)
     last_name = models.CharField(verbose_name=_('Last Name'), max_length=50)
@@ -97,79 +89,3 @@ class Interest(DateModel):
 
     def __str__(self):
         return self.name
-
-
-# Proxy User Model -> Default
-class UserDefaultModelManager(models.Manager):
-    def get_queryset(self):
-        return super(UserDefaultModelManager, self).get_queryset().filter(user_type=USER_DEFAULT)
-
-
-class UserDefault(User):
-    objects = UserDefaultModelManager()
-
-    class Meta:
-        proxy = True
-        verbose_name = _(u'User')
-        verbose_name_plural = _(u'Users')
-
-    def save(self, *args, **kwargs):
-        self.user_type = USER_DEFAULT
-        super(UserDefault, self).save(*args, **kwargs)
-
-
-# Proxy User Model -> Editor
-class UserEditorModelManager(models.Manager):
-    def get_queryset(self):
-        return super(UserEditorModelManager, self).get_queryset().filter(user_type=USER_EDITOR)
-
-
-class UserEditor(User):
-    objects = UserEditorModelManager()
-
-    class Meta:
-        proxy = True
-        verbose_name = _(u'Editor')
-        verbose_name_plural = _(u'Editors')
-
-    def save(self, *args, **kwargs):
-        self.user_type = USER_EDITOR
-        super(UserEditor, self).save(*args, **kwargs)
-
-
-# Proxy User Model -> Assigned Editor
-class UserAssignedEditorModelManager(models.Manager):
-    def get_queryset(self):
-        return super(UserAssignedEditorModelManager, self).get_queryset().filter(user_type=USER_ASSIGNEDEDITOR)
-
-
-class UserAssignedEditor(User):
-    objects = UserAssignedEditorModelManager()
-
-    class Meta:
-        proxy = True
-        verbose_name = _(u'Assigned Editor')
-        verbose_name_plural = _(u'Assigned Editors')
-
-    def save(self, *args, **kwargs):
-        self.user_type = USER_ASSIGNEDEDITOR
-        super(UserAssignedEditor, self).save(*args, **kwargs)
-
-
-# Proxy User Model -> Reviewer
-class UserReviewerModelManager(models.Manager):
-    def get_queryset(self):
-        return super(UserReviewerModelManager, self).get_queryset().filter(user_type=USER_REVIEWER)
-
-
-class UserReviewer(User):
-    objects = UserReviewerModelManager()
-
-    class Meta:
-        proxy = True
-        verbose_name = _(u'Reviewer')
-        verbose_name_plural = _(u'Reviewers')
-
-    def save(self, *args, **kwargs):
-        self.user_type = USER_REVIEWER
-        super(UserReviewer, self).save(*args, **kwargs)

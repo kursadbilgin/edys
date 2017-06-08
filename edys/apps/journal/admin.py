@@ -1,5 +1,11 @@
+# Standard Library
+from copy import deepcopy
+from functools import partial
+
 # Django
+from django.db.models import Q
 from django.contrib import admin
+from django.contrib import messages
 from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.admin.templatetags.admin_modify import *
@@ -7,14 +13,13 @@ from django.contrib.admin.templatetags.admin_modify import submit_row as origina
 
 # Local Django
 from user.models import User
-from .forms import ArticleForm
-from journal.models import Journal, Period, Article, ArticleDocument
-from core.variables import GROUP_EDITOR
-from core.variables import (
-    USER_TYPES,
-    USER_DEFAULT, USER_EDITOR,
-    USER_ASSIGNEDEDITOR, USER_REVIEWER
+from journal.forms import ArticleAdminForm
+from journal.mixins import ArticleAdminMixin
+from journal.models import (
+    Journal, Period, Article, ArticleProxy, ArticleProxyT, ArticleDocument
 )
+from core.variables import GROUP_ADMIN, GROUP_DEFAULT
+
 
 @register.inclusion_tag('admin/submit_line.html', takes_context=True)
 def submit_row(context):
@@ -26,6 +31,7 @@ def submit_row(context):
         })
     return ctx
 
+
 class ArticleDocumentInline(admin.StackedInline):
     model = ArticleDocument
     extra = 0
@@ -33,37 +39,52 @@ class ArticleDocumentInline(admin.StackedInline):
     verbose_name = _('Document')
     verbose_name_plural = _('Documents')
 
+    def get_readonly_fields(self, request, obj=None):
+
+        if request.user.is_superuser :
+            return self.readonly_fields
+        else:
+            readonly_fields = ['description', 'document']
+            return readonly_fields
 
 @admin.register(Journal)
 class JournalAdmin(admin.ModelAdmin):
-    list_display = ('name', 'get_users')
+    list_display = ('name', 'user')
     search_fields = ('name',)
+    filter_horizontal = ('editors', 'assigned_editors')
 
     def get_fields(self, request, *args, **kwargs):
         fields = super(JournalAdmin, self). get_fields(request, *args, **kwargs)
 
         exclude_fields = []
-        if not request.user.is_superuser and not request.user.user_type==USER_EDITOR:
-            exclude_fields.append('user')
+        group_names = [group.name for group in request.user.groups.all()]
+        if not request.user.is_superuser:
+            exclude_fields.append('user',)
+            if not GROUP_ADMIN in group_names:
+                exclude_fields.append('editors')
+                exclude_fields.append('assigned_editors')
 
         return [field for field in fields if field not in exclude_fields]
 
     def get_queryset(self, request):
         qs = super(JournalAdmin, self).get_queryset(request)
 
-        if request.user.user_type==USER_EDITOR:
-            qs = qs.filter(users=request.user.id)
+        group_names = [group.name for group in request.user.groups.all()]
+        if not request.user.is_superuser and not GROUP_DEFAULT in group_names:
+            qs = qs.filter(user=request.user.id)
 
         return qs
 
     def has_add_permission(self, request):
-        if request.user.is_superuser or request.user.user_type==USER_EDITOR:
+        group_names = [group.name for group in request.user.groups.all()]
+        if request.user.is_superuser or GROUP_ADMIN in group_names:
             return True
         else:
             return False
 
     def has_delete_permission(self, request, obj=None):
-        if request.user.is_superuser or request.user.user_type==USER_EDITOR:
+        group_names = [group.name for group in request.user.groups.all()]
+        if request.user.is_superuser or GROUP_ADMIN in group_names:
             return True
         else:
             return False
@@ -71,13 +92,14 @@ class JournalAdmin(admin.ModelAdmin):
     def get_actions(self, request):
         actions = super(JournalAdmin, self).get_actions(request)
 
-        if not request.user.is_superuser and not request.user.user_type==USER_EDITOR:
+        group_names = [group.name for group in request.user.groups.all()]
+        if not request.user.is_superuser and not GROUP_ADMIN in group_names:
             del actions['delete_selected']
 
         return actions
 
     def save_model(self, request, obj, form, change):
-        if not request.user.is_superuser or not request.user.user_type==USER_EDITOR:
+        if not request.user.is_superuser:
             obj.user = request.user
 
         obj.save()
@@ -85,14 +107,16 @@ class JournalAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         actions = super(JournalAdmin, self). get_actions(request)
 
-        if request.user.is_superuser or request.user.user_type==USER_EDITOR:
+        group_names = [group.name for group in request.user.groups.all()]
+        if request.user.is_superuser or GROUP_ADMIN in group_names:
             return self.readonly_fields
         else:
-            readonly_fields = ['users', 'name', 'content']
+            readonly_fields = ['editors', 'assigned_editors', 'max_file_size', 'name', 'content']
             return readonly_fields
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
-        if not request.user.is_superuser and not request.user.user_type==USER_EDITOR:
+        group_names = [group.name for group in request.user.groups.all()]
+        if not request.user.is_superuser and not GROUP_ADMIN in group_names:
             extra_context = extra_context or {}
             extra_context['show_save_and_add_another'] = False
             extra_context['show_save_and_continue'] = False
@@ -110,33 +134,35 @@ class PeriodAdmin(admin.ModelAdmin):
         fields = super(PeriodAdmin, self). get_fields(request, *args, **kwargs)
 
         exclude_fields = []
-        if not request.user.is_superuser or not request.user.user_type==USER_EDITOR:
+        if not request.user.is_superuser:
             exclude_fields.append('user')
 
         return [field for field in fields if field not in exclude_fields]
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "journal" and not request.user.is_superuser:
-            kwargs["queryset"] = Journal.objects.filter(users=request.user)
+            kwargs["queryset"] = Journal.objects.filter(user=request.user)
 
         return super(PeriodAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_queryset(self, request):
         qs = super(PeriodAdmin, self).get_queryset(request)
 
-        if request.user.user_type==USER_EDITOR:
+        if request.user.is_superuser:
             qs = qs.filter(journal__period__user=request.user.id)
 
         return qs
 
     def has_add_permission(self, request):
-        if request.user.is_superuser or request.user.user_type==USER_EDITOR:
+        group_names = [group.name for group in request.user.groups.all()]
+        if request.user.is_superuser or GROUP_ADMIN in group_names:
             return True
         else:
             return False
 
     def has_delete_permission(self, request, obj=None):
-        if request.user.is_superuser or request.user.user_type==USER_EDITOR:
+        group_names = [group.name for group in request.user.groups.all()]
+        if request.user.is_superuser or GROUP_ADMIN in group_names:
             return True
         else:
             return False
@@ -144,13 +170,14 @@ class PeriodAdmin(admin.ModelAdmin):
     def get_actions(self, request):
         actions = super(PeriodAdmin, self).get_actions(request)
 
-        if not request.user.is_superuser and not request.user.user_type==USER_EDITOR:
+        group_names = [group.name for group in request.user.groups.all()]
+        if not request.user.is_superuser and not GROUP_ADMIN in group_names:
             del actions['delete_selected']
 
         return actions
 
     def save_model(self, request, obj, form, change):
-        if not request.user.is_superuser or not request.user.user_type==USER_EDITOR:
+        if not request.user.is_superuser:
             obj.user = request.user
 
         obj.save()
@@ -158,14 +185,16 @@ class PeriodAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         actions = super(PeriodAdmin, self). get_actions(request)
 
-        if request.user.is_superuser or request.user.user_type==USER_EDITOR:
+        group_names = [group.name for group in request.user.groups.all()]
+        if request.user.is_superuser or GROUP_ADMIN in group_names:
             return self.readonly_fields
         else:
             readonly_fields = ['period', 'journal']
             return readonly_fields
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
-        if not request.user.is_superuser and not request.user.user_type==USER_EDITOR:
+        group_names = [group.name for group in request.user.groups.all()]
+        if not request.user.is_superuser and not GROUP_ADMIN in group_names:
             extra_context = extra_context or {}
             extra_context['show_save_and_add_another'] = False
             extra_context['show_save_and_continue'] = False
@@ -175,28 +204,22 @@ class PeriodAdmin(admin.ModelAdmin):
 
 
 @admin.register(Article)
-class ArticleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'title', 'journal', 'period', 'user')
+class ArticleAdmin(ArticleAdminMixin):
     inlines = (ArticleDocumentInline,)
-    form = ArticleForm
 
-    def get_fields(self, request, *args, **kwargs):
-        fields = super(ArticleAdmin, self). get_fields(request, *args, **kwargs)
 
-        exclude_fields = []
-        if not request.user.is_superuser or not request.user.user_type==USER_EDITOR:
-            exclude_fields.append('user')
-
-        if not request.user.is_superuser:
-            exclude_fields.append('period')
-
-        if request.user.user_type==USER_DEFAULT or request.user.user_type==USER_REVIEWER:
-            exclude_fields.append('assigned_editors') or exclude_fields.append('reviewers')
-
-        if request.user.user_type==USER_ASSIGNEDEDITOR:
-            exclude_fields.append('assigned_editors')
-
-        return [field for field in fields if field not in exclude_fields]
+    # def get_fields(self, request, *args, **kwargs):
+    #     fields = super(ArticleAdmin, self). get_fields(request, *args, **kwargs)
+    #
+    #     exclude_fields = []
+    #     if not request.user.is_superuser:
+    #         exclude_fields.append('user')
+    #         exclude_fields.append('journal')
+    #         exclude_fields.append('editors')
+    #         exclude_fields.append('assigned_editors')
+    #         exclude_fields.append('reviewers')
+    #
+    #     return [field for field in fields if field not in exclude_fields]
 
     def get_queryset(self, request):
         qs = super(ArticleAdmin, self).get_queryset(request)
@@ -206,24 +229,120 @@ class ArticleAdmin(admin.ModelAdmin):
 
         return qs
 
+    # def formfield_for_manytomany(self, db_field, request, **kwargs):
+    #     if db_field.name == "editors":
+    #         kwargs["queryset"] = User.objects.filter(journal_editors=request.GET.get('journal'))
+    #
+    #     if db_field.name == "assigned_editors":
+    #         kwargs["queryset"] = User.objects.filter(journal_assigned_editors=request.GET.get('journal'))
+    #
+    #     return super(ArticleAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
+
+
     def save_model(self, request, obj, form, change):
-        if not request.user.is_superuser or not request.user.user_type==USER_EDITOR:
-            obj.user = request.user
         if not request.user.is_superuser:
-            period = Period.objects.get()
-            obj.period = period
+            obj.user = request.user
+
+            try:
+                journal = Journal.objects.get(id=request.GET.get('journal'))
+                obj.journal = journal
+            except Journal.DoesNotExist:
+                pass
 
         obj.save()
 
 
-@admin.register(ArticleDocument)
-class ArticleDocumentAdmin(admin.ModelAdmin):
-    list_display = ('description', 'document')
+@admin.register(ArticleProxy)
+class ArticleProxyAdmin(ArticleAdminMixin):
+    list_display = ('name', 'title', 'journal',)
+    inlines = (ArticleDocumentInline,)
+
+    def get_fields(self, request, *args, **kwargs):
+        fields = super(ArticleProxyAdmin, self). get_fields(request, *args, **kwargs)
+
+        exclude_fields = []
+        if not request.user.is_superuser:
+            exclude_fields.append('user')
+            exclude_fields.append('journal')
+            exclude_fields.append('editors')
+            exclude_fields.append('assigned_editors')
+            exclude_fields.append('reviewers')
+
+        return [field for field in fields if field not in exclude_fields]
 
     def get_queryset(self, request):
-        qs = super(ArticleDocumentAdmin, self).get_queryset(request)
+        qs = super(ArticleProxyAdmin, self).get_queryset(request)
 
-        if not request.user.is_superuser and not request.user.user_type==USER_EDITOR:
-            qs = qs.filter(article__user=request.user.id)
+        if not request.user.is_superuser:
+            qs = qs.filter(user=request.user)
 
         return qs
+
+    def has_add_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        else:
+            return False
+
+    # def get_readonly_fields(self, request, obj=None):
+    #     actions = super(ArticleProxyAdmin, self). get_actions(request)
+    #
+    #     group_names = [group.name for group in request.user.groups.all()]
+    #     if request.user.is_superuser or GROUP_ADMIN in group_names:
+    #         return self.readonly_fields
+    #     else:
+    #         readonly_fields = []
+    #         return readonly_fields
+
+
+@admin.register(ArticleProxyT)
+class ArticleProxyTAdmin(ArticleAdminMixin):
+    list_display = ('name', 'title', 'journal',)
+    inlines = (ArticleDocumentInline,)
+
+    def get_queryset(self, request):
+        qs = super(ArticleProxyTAdmin, self).get_queryset(request)
+
+        if not request.user.is_superuser:
+            qs = qs.filter(Q(journal__user=request.user)
+                        | Q(journal__article__editors=request.user)
+                        | Q(journal__article__assigned_editors=request.user)
+                        | Q(journal__article__reviewers=request.user)
+            )
+
+        return qs
+
+    def get_fields(self, request, *args, **kwargs):
+        fields = super(ArticleProxyTAdmin, self).get_fields(request, *args, **kwargs)
+
+        exclude_fields = []
+        if not request.user.is_superuser:
+            exclude_fields.append('user')
+            exclude_fields.append('journal')
+
+            #exclude_fields.filter('editors')
+            #exclude_fields.append('assigned_editors')
+            #exclude_fields.append('reviewers')
+
+        return [field for field in fields if field not in exclude_fields]
+
+    def has_add_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        else:
+            return False
+
+    def has_delete_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        else:
+            return False
+
+    def get_readonly_fields(self, request, obj=None):
+        actions = super(ArticleProxyTAdmin, self). get_actions(request)
+
+        if request.user.is_superuser:
+            return self.readonly_fields
+        else:
+            readonly_fields = ['title', 'name', 'abstract']
+            return readonly_fields

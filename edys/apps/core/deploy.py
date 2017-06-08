@@ -1,5 +1,5 @@
 # Local Django
-from core.utils import default, editor, assigned_editor, reviewer
+from core.utils import default, admin
 
 
 def set_up_app():
@@ -13,21 +13,9 @@ def set_up_app():
         print('* \033[1;31mDefault\033[1;37m')
 
     try:
-        editor()
-        print('* \033[1;32mEditor\033[1;37m')
+        admin()
+        print('* \033[1;32mAdmin\033[1;37m')
     except:
-        print('* \033[1;31mEditor\033[1;37m')
-
-    try:
-        assigned_editor()
-        print('* \033[1;32mAssigned Editor\033[1;37m')
-    except:
-        print('* \033[1;31mAssigned Editor\033[1;37m')
-
-    try:
-        reviewer()
-        print('* \033[1;32mReviewer\033[1;37m')
-    except:
-        print('* \033[1;31mReviewer\033[1;37m')
+        print('* \033[1;31mAdmin\033[1;37m')
 
 #####################
