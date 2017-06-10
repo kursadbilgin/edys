@@ -11,18 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 
 # Local Django
 from journal.models import Journal, Article
-
-class ArticleDocumentAdminForm(forms.ModelForm):
-    document = forms.FileField(label=_('Document'))
-
-    def clean_document(self):
-         document = self.cleaned_data['document']
-
-         if 'document' in self.changed_data:
-
-             if document._size > max_file_size*1048576:
-                   raise ValidationError(_('Please keep filesize under.'))
-         return document
+from journal.extension import UPLOAD_DOCUMENT_TYPE
 
 
 class ArticleAdminForm(forms.ModelForm):
@@ -33,7 +22,26 @@ class ArticleAdminForm(forms.ModelForm):
            'abstract': RedactorEditor(),
         }
 
+
+class ArticleDocumentAdminForm(forms.ModelForm):
+    document = forms.FileField(label=_('Document'))
+
+    def clean_document(self):
+         document = self.cleaned_data['document']
+
+         if 'document' in self.changed_data:
+
+             if not document.content_type in UPLOAD_DOCUMENT_TYPE:
+                 raise forms.ValidationError(
+                    _('Please only upload document (doc, pdf, txt, exel, powerpoint).')
+                )
+
+         return document
+
+
+class ArticleProxyTAdminForm(forms.ModelForm):
+
     def __init__(self, *args, **kwargs):
-        super(ArticleAdminForm, self).__init__(*args, **kwargs)
+        super(ArticleProxyTAdminForm, self).__init__(*args, **kwargs)
         self.fields['editors'].queryset = self.instance.journal.editors.all()
         self.fields['assigned_editors'].queryset = self.instance.journal.assigned_editors.all()

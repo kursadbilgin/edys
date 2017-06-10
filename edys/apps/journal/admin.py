@@ -13,7 +13,9 @@ from django.contrib.admin.templatetags.admin_modify import submit_row as origina
 
 # Local Django
 from user.models import User
-from journal.forms import ArticleAdminForm
+from journal.forms import (
+    ArticleAdminForm, ArticleProxyTAdminForm, ArticleDocumentAdminForm
+)
 from journal.mixins import ArticleAdminMixin
 from journal.models import (
     Journal, Period, Article, ArticleProxy, ArticleProxyT, ArticleDocument
@@ -38,14 +40,8 @@ class ArticleDocumentInline(admin.StackedInline):
     min_num = 1
     verbose_name = _('Document')
     verbose_name_plural = _('Documents')
+    form = ArticleDocumentAdminForm
 
-    def get_readonly_fields(self, request, obj=None):
-
-        if request.user.is_superuser :
-            return self.readonly_fields
-        else:
-            readonly_fields = ['description', 'document']
-            return readonly_fields
 
 @admin.register(Journal)
 class JournalAdmin(admin.ModelAdmin):
@@ -207,19 +203,18 @@ class PeriodAdmin(admin.ModelAdmin):
 class ArticleAdmin(ArticleAdminMixin):
     inlines = (ArticleDocumentInline,)
 
+    def get_fields(self, request, *args, **kwargs):
+        fields = super(ArticleAdmin, self). get_fields(request, *args, **kwargs)
 
-    # def get_fields(self, request, *args, **kwargs):
-    #     fields = super(ArticleAdmin, self). get_fields(request, *args, **kwargs)
-    #
-    #     exclude_fields = []
-    #     if not request.user.is_superuser:
-    #         exclude_fields.append('user')
-    #         exclude_fields.append('journal')
-    #         exclude_fields.append('editors')
-    #         exclude_fields.append('assigned_editors')
-    #         exclude_fields.append('reviewers')
-    #
-    #     return [field for field in fields if field not in exclude_fields]
+        exclude_fields = []
+        if not request.user.is_superuser:
+            exclude_fields.append('user')
+            exclude_fields.append('journal')
+            exclude_fields.append('editors')
+            exclude_fields.append('assigned_editors')
+            exclude_fields.append('reviewers')
+
+        return [field for field in fields if field not in exclude_fields]
 
     def get_queryset(self, request):
         qs = super(ArticleAdmin, self).get_queryset(request)
@@ -228,16 +223,6 @@ class ArticleAdmin(ArticleAdminMixin):
             qs = qs.filter(user=request.user)
 
         return qs
-
-    # def formfield_for_manytomany(self, db_field, request, **kwargs):
-    #     if db_field.name == "editors":
-    #         kwargs["queryset"] = User.objects.filter(journal_editors=request.GET.get('journal'))
-    #
-    #     if db_field.name == "assigned_editors":
-    #         kwargs["queryset"] = User.objects.filter(journal_assigned_editors=request.GET.get('journal'))
-    #
-    #     return super(ArticleAdmin, self).formfield_for_manytomany(db_field, request, **kwargs)
-
 
     def save_model(self, request, obj, form, change):
         if not request.user.is_superuser:
@@ -284,21 +269,20 @@ class ArticleProxyAdmin(ArticleAdminMixin):
         else:
             return False
 
-    # def get_readonly_fields(self, request, obj=None):
-    #     actions = super(ArticleProxyAdmin, self). get_actions(request)
-    #
-    #     group_names = [group.name for group in request.user.groups.all()]
-    #     if request.user.is_superuser or GROUP_ADMIN in group_names:
-    #         return self.readonly_fields
-    #     else:
-    #         readonly_fields = []
-    #         return readonly_fields
+    def get_readonly_fields(self, request, obj=None):
+
+        if request.user.is_superuser :
+            return self.readonly_fields
+        else:
+            readonly_fields = ['title', 'name', 'abstract']
+            return readonly_fields
 
 
 @admin.register(ArticleProxyT)
 class ArticleProxyTAdmin(ArticleAdminMixin):
     list_display = ('name', 'title', 'journal',)
     inlines = (ArticleDocumentInline,)
+    form = ArticleProxyTAdminForm
 
     def get_queryset(self, request):
         qs = super(ArticleProxyTAdmin, self).get_queryset(request)
@@ -319,10 +303,6 @@ class ArticleProxyTAdmin(ArticleAdminMixin):
         if not request.user.is_superuser:
             exclude_fields.append('user')
             exclude_fields.append('journal')
-
-            #exclude_fields.filter('editors')
-            #exclude_fields.append('assigned_editors')
-            #exclude_fields.append('reviewers')
 
         return [field for field in fields if field not in exclude_fields]
 

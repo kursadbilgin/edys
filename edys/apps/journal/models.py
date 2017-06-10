@@ -115,10 +115,10 @@ def set_upload_document_path(instance, filename):
 
 class ArticleDocument(DateModel):
     description = models.CharField(
-        verbose_name=_('Description'), max_length=100,null=True
+        verbose_name=_('Description'), max_length=100, null=True
     )
     document = models.FileField(
-        verbose_name=_('Document'),upload_to=set_upload_document_path
+        verbose_name=_('Document'), upload_to=set_upload_document_path
     )
     article = models.ForeignKey(verbose_name=_('Article'), to=Article)
 
